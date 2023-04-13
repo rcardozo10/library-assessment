@@ -24,15 +24,9 @@ return borrowed;
 }
 
 function getBooksPossessedByAccount(account, books, authors) {
-  //filter through each book in books
   return (
-    books
-      //checking to see if the most recent transaction matches our account and that it hasn't been returned
-      .filter(
-        (book) => book.borrows[0].id === account.id && !book.borrows[0].returned
-      )
-      //map through all the filtered books to add the author object to it
-      .map((book) => {
+    books.filter((book) => book.borrows[0].id === account.id && !book.borrows[0].returned
+      ).map((book) => {
         book["author"] = authors.find((author) => author.id === book.authorId);
         return book;
       })
