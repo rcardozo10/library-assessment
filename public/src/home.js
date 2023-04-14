@@ -37,29 +37,42 @@ function getMostCommonGenres(books) {
 }
 
 function getMostPopularBooks(books) {
- return books
-  .map((book) => {
-   return { name: book.title, count: book.borrows.length };
-  })
-  .sort((a, b) => (a.count < b.count ? 1 : -1))
-  .slice(0, 5);
+  return sliceSort(
+    // map method
+    books.map(({ title, borrows }) => ({
+      name: title,
+      count: arrayItemCount(borrows),
+    }))
+  );
 }
 
 function getMostPopularAuthors(books, authors) {
- let result = [];
- authors.forEach((author) => {
-  let theAuthor = {
-   name: `${author.name.first} ${author.name.last}`,
-   count: 0
-  };
-  books.forEach((book) => {
-   if (book.authorId === author.id) {
-    theAuthor.count += book.borrows.length;
-   }
-  });
-  result.push(theAuthor);
- });
- return result.sort((a, b) => b.count - a.count).slice(0, 5);
+  return sliceSort(authors.map(({ name: { first, last }, id }) => ({
+      name: `${first} ${last}`,
+      count: authorBooks(books, id), 
+    }))
+  );
+}
+
+// helper function
+function sliceSort(arr, slicer = 5) {
+  const newArr = [...arr];
+  return newArr
+    .sort(({ count: count1 }, { count: count2 }) => count2 - count1)
+    .slice(0, slicer);
+}
+
+//helper function and reduce method
+function authorBooks(books, id) {
+  return books.reduce((totalBorrows, { authorId, borrows }) => {
+    if (authorId === id) totalBorrows += arrayItemCount(borrows);
+    return totalBorrows;
+  }, 0);
+}
+
+// helper function
+function arrayItemCount(item) {
+  return item.length;
 }
 
 module.exports = {
